@@ -1,30 +1,30 @@
+import {service} from '@loopback/core';
 import {
   Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
+  del, get,
+  getModelSchemaRef, param, patch, post, put, requestBody,
+  response
 } from '@loopback/rest';
 import {Usuario} from '../models';
 import {UsuarioRepository} from '../repositories';
+import {AutenticacionService} from '../services';
+const fetch = require('node-fetch');
 
 export class UsuarioController {
   constructor(
     @repository(UsuarioRepository)
-    public usuarioRepository : UsuarioRepository,
-  ) {}
+    public usuarioRepository: UsuarioRepository,
+
+    @service(AutenticacionService)
+    public servicioAutenticacion: AutenticacionService
+  ) { }
 
   @post('/usuarios')
   @response(200, {
@@ -44,7 +44,24 @@ export class UsuarioController {
     })
     usuario: Omit<Usuario, 'id'>,
   ): Promise<Usuario> {
-    return this.usuarioRepository.create(usuario);
+    let clave = this.servicioAutenticacion.GenerarClave();
+    let claveCifrada = this.servicioAutenticacion.CifrarClave(clave);
+    usuario.contrasena = claveCifrada;
+    let p = await this.usuarioRepository.create(usuario);
+
+    // Notificar al usuario
+    let destino = usuario.correo;
+    let asunto = 'Datos de registro en plataforma';
+    let contenido = `Hola ${usuario.nombre} Bienvenido a la plataforma de Mascota Feliz, su usuario es ${usuario.correo} y su contrasena es ${usuario.contrasena}`;
+
+    //fetch(`http://127.0.0.1:5000/email?correo_destino=${usuario.correo}&asunto=${'Datos de registro'}&contenido=${'Hola'}`)
+
+    fetch(`http://127.0.0.1:5000/email?correo_destino=${destino}&asunto=${asunto}&contenido=${contenido}`)
+      .then((data: any) => {
+        console.log(data);
+      })
+      return p;
+
   }
 
   @get('/usuarios/count')
