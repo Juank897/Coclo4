@@ -26,6 +26,7 @@ export class PlanController {
     public planRepository : PlanRepository,
   ) {}
 
+  
   @post('/plans')
   @response(200, {
     description: 'Plan model instance',

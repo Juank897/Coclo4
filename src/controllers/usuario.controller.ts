@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {service} from '@loopback/core';
 import {
   Count,
@@ -26,20 +27,22 @@ export class UsuarioController {
     public servicioAutenticacion: AutenticacionService
   ) { }
 
-  @post('/identificarUsuario',{
-    responses:{
-      '200':{
-        description:'Identificacion de usuario'
+  // para que no ingrese a la autenticacion
+  //@authenticate.skip()
+  @post('/identificarUsuario', {
+    responses: {
+      '200': {
+        description: 'Identificacion de usuario'
       }
     }
   })
   async identificarUsuario(
-    @requestBody() credenciales : Credenciales
-  ){
+    @requestBody() credenciales: Credenciales
+  ) {
     let u = await this.servicioAutenticacion.IdentificarUsuario(credenciales.usuario, credenciales.contrasena);
-    if(u){
+    if (u) {
       let token = this.servicioAutenticacion.GenerarTokenJWT(u);
-      return{
+      return {
         datos: {
           id: u.id,
           cedula: u.cedula,
@@ -52,13 +55,15 @@ export class UsuarioController {
         },
         tk: token
       }
-    }else{
+    } else {
       throw new HttpErrors[401]('Datos inválidos');
     }
 
   }
 
 
+  // el administrador puede crear usuarios
+  // @authenticate('admin')
   @post('/usuarios')
   @response(200, {
     description: 'Usuario model instance',
@@ -94,7 +99,7 @@ export class UsuarioController {
       .then((data: any) => {
         console.log(data);
       })
-      return u;
+    return u;
 
   }
 
