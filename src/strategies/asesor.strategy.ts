@@ -6,7 +6,7 @@ import parseBearerToken from 'parse-bearer-token';
 import {AutenticacionService} from '../services';
 
 export class EstrategiaAsesor implements AuthenticationStrategy {
-  name: string = 'asesor';
+  name: string = 'Asesor';
 
   constructor(
     @service(AutenticacionService)

@@ -64,6 +64,7 @@ export class UsuarioController {
 
   // el administrador puede crear usuarios
   // @authenticate('admin')
+
   @post('/usuarios')
   @response(200, {
     description: 'Usuario model instance',
@@ -84,6 +85,7 @@ export class UsuarioController {
   ): Promise<Usuario> {
     let contrasena = this.servicioAutenticacion.GenerarContrasena();
     let contrasenaCifrada = this.servicioAutenticacion.CifrarContrasena(contrasena);
+
     usuario.contrasena = contrasenaCifrada;
 
     let u = await this.usuarioRepository.create(usuario);
