@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -58,6 +59,8 @@ export class ProspectoController {
     return this.prospectoRepository.count(where);
   }
 
+
+  @authenticate('Administrador')
   @get('/prospectos')
   @response(200, {
     description: 'Array of Prospecto model instances',

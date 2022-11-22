@@ -63,7 +63,7 @@ export class UsuarioController {
 
 
   // el administrador puede crear usuarios
-  // @authenticate('admin')
+   @authenticate('Administrador')
 
   @post('/usuarios')
   @response(200, {
@@ -84,6 +84,7 @@ export class UsuarioController {
     usuario: Omit<Usuario, 'id'>,
   ): Promise<Usuario> {
     let contrasena = this.servicioAutenticacion.GenerarContrasena();
+    console.log("La contraseña es:"+contrasena);
     let contrasenaCifrada = this.servicioAutenticacion.CifrarContrasena(contrasena);
 
     usuario.contrasena = contrasenaCifrada;
@@ -93,7 +94,7 @@ export class UsuarioController {
     // Notificar al usuario
     let destino = usuario.correo;
     let asunto = 'Datos de registro en plataforma';
-    let contenido = `Hola ${usuario.nombre} Bienvenido a la plataforma de Mascota Feliz, su usuario es ${usuario.correo} y su contrasena es ${usuario.contrasena}`;
+    let contenido = `Hola ${usuario.nombre} Bienvenido a la plataforma de Mascota Feliz, su usuario es ${usuario.correo} y su contrasena es ${contrasena}`;
 
 
 
@@ -116,6 +117,7 @@ export class UsuarioController {
     return this.usuarioRepository.count(where);
   }
 
+  @authenticate('Administrador')
   @get('/usuarios')
   @response(200, {
     description: 'Array of Usuario model instances',
